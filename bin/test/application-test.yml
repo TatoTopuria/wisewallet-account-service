@@ -1,0 +1,9 @@
+spring:
+  mail:
+    host: localhost
+    port: 3025
+    test-connection: false
+  data:
+    redis:
+      host: localhost
+      port: 6379

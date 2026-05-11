@@ -1,0 +1,43 @@
+spring:
+  application:
+    name: account-service
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.xml
+  data:
+    web:
+      pageable:
+        max-page-size: 100
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+server:
+  port: 8081
+  error:
+    include-message: always
+    include-binding-errors: always
+
+management:
+  server:
+    port: 8091
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+
+jwt:
+  issuer: wisewallet
+  access-token-ttl-seconds: 900
+  refresh-token-ttl-days: 7
+
+logging:
+  level:
+    com.wisewallet.account: INFO

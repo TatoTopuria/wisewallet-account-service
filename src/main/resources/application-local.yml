@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/account_db
+    username: postgres
+    password: ${DB_PASSWORD:dev_password}
+  kafka:
+    bootstrap-servers: localhost:9092
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+
+jwt:
+  secret: ${JWT_SECRET:local-dev-secret-replace-this-needs-32chars!}
+
+logging:
+  level:
+    com.wisewallet.account: DEBUG
