@@ -38,6 +38,12 @@ jwt:
   access-token-ttl-seconds: 900
   refresh-token-ttl-days: 7
 
+wisewallet:
+  internal:
+    jwt:
+      secret: ${INTERNAL_JWT_SECRET}
+    api-key: ${INTERNAL_API_KEY}
+
 logging:
   level:
     com.wisewallet.account: INFO

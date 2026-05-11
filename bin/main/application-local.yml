@@ -18,6 +18,12 @@ spring:
 jwt:
   secret: ${JWT_SECRET:local-dev-secret-replace-this-needs-32chars!}
 
+wisewallet:
+  internal:
+    jwt:
+      secret: ${INTERNAL_JWT_SECRET:local-dev-internal-jwt-secret-needs-32chars!}
+    api-key: ${INTERNAL_API_KEY:dev-internal-api-key}
+
 logging:
   level:
     com.wisewallet.account: DEBUG

@@ -17,6 +17,15 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    private final InternalJwtValidator internalJwtValidator;
+    private final InternalApiKeyFilter internalApiKeyFilter;
+
+    public SecurityConfig(InternalJwtValidator internalJwtValidator,
+                          InternalApiKeyFilter internalApiKeyFilter) {
+        this.internalJwtValidator = internalJwtValidator;
+        this.internalApiKeyFilter = internalApiKeyFilter;
+    }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -28,20 +37,22 @@ public class SecurityConfig {
                     "/api/auth/login", "/api/auth/refresh"
                 ).permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/auth/verify").permitAll()
-                .requestMatchers("/internal/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-            .addFilterBefore(headerBasedAuthFilter(), UsernamePasswordAuthenticationFilter.class);
+            // InternalApiKeyFilter runs first for /internal/** paths
+            .addFilterBefore(internalApiKeyFilter, UsernamePasswordAuthenticationFilter.class)
+            // InternalJwtAuthFilter populates SecurityContext from X-Service-Token
+            .addFilterBefore(internalJwtAuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
     @Bean
-    public HeaderBasedAuthFilter headerBasedAuthFilter() {
-        return new HeaderBasedAuthFilter();
+    public InternalJwtAuthFilter internalJwtAuthFilter() {
+        return new InternalJwtAuthFilter(internalJwtValidator);
     }
 
     @Bean

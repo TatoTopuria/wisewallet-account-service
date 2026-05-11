@@ -26,6 +26,11 @@ public class AccountBalanceRepositoryAdapter implements AccountBalanceRepository
     }
 
     @Override
+    public Optional<AccountBalance> findByAccountIdAndCurrencyForUpdate(UUID accountId, String currency) {
+        return jpa.findByAccountIdAndCurrencyForUpdate(accountId, currency);
+    }
+
+    @Override
     public Optional<AccountBalance> findById(UUID id) {
         return jpa.findById(id);
     }

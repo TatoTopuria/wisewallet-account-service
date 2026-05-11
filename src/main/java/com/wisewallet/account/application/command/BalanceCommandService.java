@@ -32,7 +32,7 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountBalance debit(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
-        AccountBalance balance = getActiveBalance(accountId, currency);
+        AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         BigDecimal available = balance.availableBalance();
         if (available.compareTo(amount) < 0) {
@@ -48,14 +48,14 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountBalance credit(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
-        AccountBalance balance = getActiveBalance(accountId, currency);
+        AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
         balance.setAmount(balance.getAmount().add(amount));
         return balanceRepository.save(balance);
     }
 
     @Transactional
     public AccountReservation reserve(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
-        AccountBalance balance = getActiveBalance(accountId, currency);
+        AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         BigDecimal available = balance.availableBalance();
         if (available.compareTo(amount) < 0) {
@@ -79,7 +79,7 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountBalance commit(UUID accountId, String currency, UUID reservationId) {
-        AccountBalance balance = getActiveBalance(accountId, currency);
+        AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         AccountReservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BusinessRuleException("Reservation not found: " + reservationId));
@@ -101,7 +101,7 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountBalance release(UUID accountId, String currency, UUID reservationId) {
-        AccountBalance balance = getActiveBalance(accountId, currency);
+        AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         AccountReservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BusinessRuleException("Reservation not found: " + reservationId));
@@ -118,6 +118,19 @@ public class BalanceCommandService {
     }
 
     // ── private helpers ───────────────────────────────────────────
+
+    private AccountBalance getActiveBalanceForUpdate(UUID accountId, String currency) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new AccountNotFoundException(accountId));
+
+        if (account.getStatus() != AccountStatus.ACTIVE) {
+            throw new AccountNotActiveException(accountId);
+        }
+
+        return balanceRepository.findByAccountIdAndCurrencyForUpdate(accountId, currency)
+                .orElseThrow(() -> new BusinessRuleException(
+                        "No balance found for account=" + accountId + " currency=" + currency));
+    }
 
     private AccountBalance getActiveBalance(UUID accountId, String currency) {
         Account account = accountRepository.findById(accountId)
