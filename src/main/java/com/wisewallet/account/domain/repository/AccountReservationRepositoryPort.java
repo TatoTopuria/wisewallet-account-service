@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface AccountReservationRepositoryPort {
     AccountReservation save(AccountReservation reservation);
     Optional<AccountReservation> findById(UUID id);
+    Optional<AccountReservation> findByTransactionId(UUID transactionId);
     List<AccountReservation> findByAccountBalanceIdAndStatus(UUID accountBalanceId, ReservationStatus status);
     List<AccountReservation> findExpiredActive(Instant now);
     void saveAll(List<AccountReservation> reservations);

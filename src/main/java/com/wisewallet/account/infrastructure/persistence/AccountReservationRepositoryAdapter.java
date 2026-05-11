@@ -28,6 +28,11 @@ public class AccountReservationRepositoryAdapter implements AccountReservationRe
     }
 
     @Override
+    public Optional<AccountReservation> findByTransactionId(UUID transactionId) {
+        return jpa.findByTransactionId(transactionId);
+    }
+
+    @Override
     public List<AccountReservation> findByAccountBalanceIdAndStatus(UUID accountBalanceId, ReservationStatus status) {
         return jpa.findByAccountBalanceIdAndStatus(accountBalanceId, status);
     }

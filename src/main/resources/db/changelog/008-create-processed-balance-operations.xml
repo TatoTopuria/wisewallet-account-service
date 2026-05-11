@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="008-create-processed-balance-operations" author="wisewallet" runOnChange="false" failOnError="true">
+        <createTable tableName="processed_balance_operations">
+            <column name="id" type="UUID">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="transaction_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_type" type="VARCHAR(10)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="processed_at" type="TIMESTAMPTZ">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="processed_balance_operations"
+            columnNames="transaction_id, account_id, operation_type"
+            constraintName="uq_processed_balance_op"/>
+
+        <createIndex tableName="processed_balance_operations" indexName="idx_pbo_processed_at">
+            <column name="processed_at"/>
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>

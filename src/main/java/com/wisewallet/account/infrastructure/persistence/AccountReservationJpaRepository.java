@@ -8,10 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountReservationJpaRepository extends JpaRepository<AccountReservation, UUID> {
     List<AccountReservation> findByAccountBalanceIdAndStatus(UUID accountBalanceId, ReservationStatus status);
+    Optional<AccountReservation> findByTransactionId(UUID transactionId);
 
     @Query("SELECT r FROM AccountReservation r WHERE r.status = 'ACTIVE' AND r.expiresAt < :now")
     List<AccountReservation> findExpiredActive(@Param("now") Instant now);

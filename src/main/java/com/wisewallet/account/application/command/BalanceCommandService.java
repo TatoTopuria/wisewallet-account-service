@@ -10,6 +10,7 @@ import com.wisewallet.account.domain.service.BalanceLowCheckService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,11 +28,18 @@ public class BalanceCommandService {
     private final AccountReservationRepositoryPort reservationRepository;
     private final UserRepositoryPort userRepository;
     private final AccountRepositoryPort accountRepository;
+    private final ProcessedBalanceOperationRepositoryPort processedOperationRepository;
     private final BalanceLowCheckService balanceLowCheckService;
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public AccountBalance debit(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
+        if (!recordOperation(transactionId, accountId, "DEBIT")) {
+            log.debug("Duplicate debit detected. transactionId={}, accountId={} — returning current balance",
+                    transactionId, accountId);
+            return getActiveBalance(accountId, currency);
+        }
+
         AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         BigDecimal available = balance.availableBalance();
@@ -48,6 +56,12 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountBalance credit(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
+        if (!recordOperation(transactionId, accountId, "CREDIT")) {
+            log.debug("Duplicate credit detected. transactionId={}, accountId={} — returning current balance",
+                    transactionId, accountId);
+            return getActiveBalance(accountId, currency);
+        }
+
         AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
         balance.setAmount(balance.getAmount().add(amount));
         return balanceRepository.save(balance);
@@ -55,6 +69,15 @@ public class BalanceCommandService {
 
     @Transactional
     public AccountReservation reserve(UUID accountId, String currency, BigDecimal amount, UUID transactionId) {
+        if (!recordOperation(transactionId, accountId, "RESERVE")) {
+            log.debug("Duplicate reserve detected. transactionId={}, accountId={} — returning existing reservation",
+                    transactionId, accountId);
+            // Return the existing reservation for idempotent replay
+            return reservationRepository.findByTransactionId(transactionId)
+                    .orElseThrow(() -> new BusinessRuleException(
+                            "Duplicate reserve: no existing reservation found for transactionId=" + transactionId));
+        }
+
         AccountBalance balance = getActiveBalanceForUpdate(accountId, currency);
 
         BigDecimal available = balance.availableBalance();
@@ -118,6 +141,25 @@ public class BalanceCommandService {
     }
 
     // ── private helpers ───────────────────────────────────────────
+
+    /**
+     * Inserts a {@link ProcessedBalanceOperation} record to mark this operation as seen.
+     * Returns {@code true} if the insert succeeded (first time); {@code false} if the unique
+     * constraint fired (duplicate — caller should return idempotent success).
+     */
+    private boolean recordOperation(UUID transactionId, UUID accountId, String operationType) {
+        try {
+            processedOperationRepository.save(ProcessedBalanceOperation.builder()
+                    .id(UUID.randomUUID())
+                    .transactionId(transactionId)
+                    .accountId(accountId)
+                    .operationType(operationType)
+                    .build());
+            return true;
+        } catch (DataIntegrityViolationException e) {
+            return false;
+        }
+    }
 
     private AccountBalance getActiveBalanceForUpdate(UUID accountId, String currency) {
         Account account = accountRepository.findById(accountId)

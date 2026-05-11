@@ -12,5 +12,6 @@
     <include file="db/changelog/005-create-email-verification-tokens-table.xml"/>
     <include file="db/changelog/006-create-outbox-events-table.xml"/>
     <include file="db/changelog/007-create-account-reservations-table.xml"/>
+    <include file="db/changelog/008-create-processed-balance-operations.xml"/>
 
 </databaseChangeLog>
