@@ -56,7 +56,7 @@ class BalanceCommandServiceTest {
         AccountBalance bal = balance(account, BigDecimal.valueOf(200), BigDecimal.ZERO);
 
         when(accountRepository.findById(accId)).thenReturn(Optional.of(account));
-        when(balanceRepository.findByAccountIdAndCurrency(accId, "USD")).thenReturn(Optional.of(bal));
+        when(balanceRepository.findByAccountIdAndCurrencyForUpdate(accId, "USD")).thenReturn(Optional.of(bal));
         when(balanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(userRepository.findById(userId)).thenReturn(Optional.of(account.getUser()));
         when(balanceLowCheckService.isBalanceLow(any(), any())).thenReturn(false);
@@ -73,7 +73,7 @@ class BalanceCommandServiceTest {
         AccountBalance bal = balance(account, BigDecimal.valueOf(30), BigDecimal.ZERO);
 
         when(accountRepository.findById(accId)).thenReturn(Optional.of(account));
-        when(balanceRepository.findByAccountIdAndCurrency(accId, "USD")).thenReturn(Optional.of(bal));
+        when(balanceRepository.findByAccountIdAndCurrencyForUpdate(accId, "USD")).thenReturn(Optional.of(bal));
 
         assertThatThrownBy(() -> service.debit(accId, "USD", BigDecimal.valueOf(50), UUID.randomUUID()))
                 .isInstanceOf(BusinessRuleException.class)
@@ -88,7 +88,7 @@ class BalanceCommandServiceTest {
         AccountBalance bal = balance(account, BigDecimal.valueOf(120), BigDecimal.ZERO);
 
         when(accountRepository.findById(accId)).thenReturn(Optional.of(account));
-        when(balanceRepository.findByAccountIdAndCurrency(accId, "USD")).thenReturn(Optional.of(bal));
+        when(balanceRepository.findByAccountIdAndCurrencyForUpdate(accId, "USD")).thenReturn(Optional.of(bal));
         when(balanceRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         when(userRepository.findById(userId)).thenReturn(Optional.of(account.getUser()));
         when(balanceLowCheckService.isBalanceLow(any(), any())).thenReturn(true);
