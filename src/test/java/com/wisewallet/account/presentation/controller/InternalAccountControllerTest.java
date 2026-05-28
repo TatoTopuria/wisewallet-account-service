@@ -2,6 +2,7 @@ package com.wisewallet.account.presentation.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wisewallet.account.application.command.BalanceCommandService;
+import com.wisewallet.account.application.query.AccountQueryService;
 import com.wisewallet.account.domain.exception.BusinessRuleException;
 import com.wisewallet.account.domain.model.*;
 import com.wisewallet.account.presentation.dto.request.InternalDebitRequest;
@@ -31,6 +32,7 @@ class InternalAccountControllerTest {
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper objectMapper;
     @MockBean BalanceCommandService balanceCommandService;
+    @MockBean AccountQueryService accountQueryService;
     @MockBean AccountMapper accountMapper;
 
     @Test

@@ -7,3 +7,12 @@ spring:
     redis:
       host: localhost
       port: 6379
+
+jwt:
+  secret: test-secret-key-for-ci-at-least-32-chars!!
+
+wisewallet:
+  internal:
+    jwt:
+      secret: test-internal-jwt-secret-for-ci-min32!!
+    api-key: test-internal-api-key

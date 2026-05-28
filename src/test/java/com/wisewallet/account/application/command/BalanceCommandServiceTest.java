@@ -27,6 +27,7 @@ class BalanceCommandServiceTest {
     @Mock AccountReservationRepositoryPort reservationRepository;
     @Mock UserRepositoryPort userRepository;
     @Mock AccountRepositoryPort accountRepository;
+    @Mock ProcessedBalanceOperationRepositoryPort processedOperationRepository;
     @Mock BalanceLowCheckService balanceLowCheckService;
     @Mock ApplicationEventPublisher eventPublisher;
 
