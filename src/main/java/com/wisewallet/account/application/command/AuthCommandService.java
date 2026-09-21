@@ -58,21 +58,21 @@ public class AuthCommandService {
                 .balanceLowThreshold(new BigDecimal("100.0000"))
                 .roles(Set.of("ROLE_USER"))
                 .build();
-        userRepository.save(user);
+        User savedUser = userRepository.save(user);
 
         // Default CHECKING account + USD balance
         UUID accountId = UUID.randomUUID();
         Account account = Account.builder()
                 .id(accountId)
-                .user(user)
+                .user(savedUser)
                 .type(AccountType.CHECKING)
                 .status(AccountStatus.ACTIVE)
                 .build();
-        accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
 
         AccountBalance balance = AccountBalance.builder()
                 .id(UUID.randomUUID())
-                .account(account)
+                .account(savedAccount)
                 .currency("USD")
                 .amount(BigDecimal.ZERO)
                 .reservedAmount(BigDecimal.ZERO)

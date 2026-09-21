@@ -77,8 +77,11 @@ tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-XX:+EnableDynamicAgentLoading")
     testLogging {
-        events("passed", "skipped", "failed")
+        events("passed", "skipped", "failed", "standardOut", "standardError")
         showExceptions = true
+        showCauses = true
+        showStackTraces = true
+        showStandardStreams = true
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
     finalizedBy(tasks.jacocoTestReport)
