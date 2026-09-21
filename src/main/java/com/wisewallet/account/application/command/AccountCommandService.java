@@ -44,7 +44,6 @@ public class AccountCommandService {
                 .nickname(nickname)
                 .type(type)
                 .status(AccountStatus.ACTIVE)
-                .version(0L)
                 .build();
         accountRepository.save(account);
 
@@ -58,7 +57,6 @@ public class AccountCommandService {
                 .currency(currency)
                 .amount(BigDecimal.ZERO)
                 .reservedAmount(BigDecimal.ZERO)
-                .version(0L)
                 .build();
         balanceRepository.save(balance);
 

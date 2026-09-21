@@ -67,7 +67,6 @@ public class AuthCommandService {
                 .user(user)
                 .type(AccountType.CHECKING)
                 .status(AccountStatus.ACTIVE)
-                .version(0L)
                 .build();
         accountRepository.save(account);
 
@@ -77,7 +76,6 @@ public class AuthCommandService {
                 .currency("USD")
                 .amount(BigDecimal.ZERO)
                 .reservedAmount(BigDecimal.ZERO)
-                .version(0L)
                 .build();
         balanceRepository.save(balance);
 
