@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.springDepMgmt)
     java
     jacoco
+    id("com.github.ben-manes.versions") version "0.51.0"
 }
 
 dependencyManagement {
@@ -75,6 +76,11 @@ dependencies {
 tasks.withType<Test> {
     useJUnitPlatform()
     jvmArgs("-XX:+EnableDynamicAgentLoading")
+    testLogging {
+        events("passed", "skipped", "failed")
+        showExceptions = true
+        exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+    }
     finalizedBy(tasks.jacocoTestReport)
 }
 
